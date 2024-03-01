@@ -1,0 +1,4 @@
+Skripta sumira vrednosti kolone amount za redove koji imaju pretrazeni string u koloni name u zadatom csv fajlu.
+Primer:
+	python analiza.py input.csv LOVO D3
+	=> Sum by name LOVO D3: 28.078

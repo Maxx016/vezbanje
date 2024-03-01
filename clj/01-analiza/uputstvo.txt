@@ -1,0 +1,6 @@
+Skripta sumira vrednosti kolone amount za redove koji imaju pretrazeni string u koloni name u zadatom csv fajlu.
+Primer:
+	Enter file: input.csv
+	Enter name: LOVO D3
+	=> File:  input.csv  name:  LOVO D3
+	=> Sum by name  LOVO D3 :  28.078
