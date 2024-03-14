@@ -1,0 +1,1 @@
+Koristite clojure -M -m labapp.core --help za instrukcije.
