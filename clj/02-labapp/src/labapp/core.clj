@@ -17,8 +17,7 @@
     (let [formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm:ss")]
       (.parse formatter s)
       true)
-    (catch DateTimeParseException e
-      false)))
+    (catch DateTimeParseException _ false)))
 
 (defn valid-uuid? [s]
   (try
@@ -91,17 +90,15 @@
 (defn pregled [opts]
   (let [{:keys [id naziv vreme vrednost limit offset]} opts]
     (when (or id naziv vreme vrednost)
-      (let [filtered-opts (->> {:id               id
-                                :naziv_merenja    naziv
-                                :vreme_merenja    vreme
-                                :vrednost_merenja vrednost}
-                               (remove #(nil? (val %)))
-                               (into {}))]
+      (let [filtered-opts (cond-> {}
+                                  id (assoc :id id)
+                                  naziv (assoc :naziv_merenja naziv)
+                                  vreme (assoc :vreme_merenja vreme)
+                                  vrednost (assoc :vrednost_merenja vrednost))]
         (->> (sql/find-by-keys db :merenje filtered-opts {:limit limit :offset offset})
              (ds/->dataset)
              (ds.print/dataset->str)
-             (println))
-        ))))
+             (println))))))
 
 (defn brisanje [opts]
   (let [id (:id opts)]
@@ -113,12 +110,11 @@
 (defn promena [opts]
   (if (and (>= (count opts) 4) (:id opts))                  ; Count opts 4 zbog limit i offset
     (let [{:keys [id naziv vreme vrednost]} opts
-          filtered-opts (->> {:naziv_merenja    naziv
-                              :vreme_merenja    vreme
-                              :vrednost_merenja vrednost
-                              :vreme_promene    (timestamp)}
-                             (remove #(nil? (val %)))
-                             (into {}))]
+          filtered-opts (cond-> {:vreme_promene (timestamp)}
+                                id (assoc :id id)
+                                vreme (assoc :vreme_merenja vreme)
+                                vrednost (assoc :vrednost_merenja vrednost)
+                                naziv (assoc :naziv_merenja naziv))]
       (sql/update! db :merenje filtered-opts {:id id})
       (println "Uspesno izmenjeno merenje id " id "!"))
     (error-msg "Uneti minimum dve opcije, --id je obavezna!")))
